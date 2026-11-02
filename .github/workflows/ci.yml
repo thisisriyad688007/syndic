@@ -230,11 +230,12 @@ jobs:
           # Command-line tools 23.0: older versions don't list platform 37.0.
           cmdline-tools-version: "16111833"
           packages: "platforms;android-37.0 ndk;30.0.16248370"
-      - uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        build-scan-publish: true
+        build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+        build-scan-terms-of-use-agree: "yes"
       - with:
-      -   build-scan-publish: true
-      -   build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
-      -   build-scan-terms-of-use-agree: "yes"
       - name: Unit tests and debug build
         working-directory: android
         run: ./gradlew --no-daemon assembleDebug
