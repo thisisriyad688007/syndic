@@ -72,7 +72,7 @@ jobs:
         run: cargo test --no-run --locked -p nectarlink-desktop -p nectarlink-vcam
       - name: QML tests
         shell: pwsh
-        run: echo "Skipping QML test"
+        run: echo "Bypassing QML tests"
       - name: Release build
         run: cargo build --locked --release -p nectarlink-desktop -p nectarlink-vcam
       - name: Install NSIS
@@ -90,7 +90,7 @@ jobs:
         run: ./scripts/ui-check.ps1
       - name: Install, run and uninstall it
         shell: pwsh
-        run: echo "Skipping smoke installer check"
+        run: echo "Bypassing smoke tests"
       - uses: actions/upload-artifact@v7
         with:
           name: nectarlink-windows-x64
@@ -134,7 +134,6 @@ jobs:
 
   desktop-macos:
     name: macOS app
-    if: false
     if: false
     runs-on: macos-latest
     steps:
@@ -234,7 +233,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
       - name: Unit tests and debug build
         working-directory: android
-        run: ./gradlew --no-daemon assembleDebug assembleDebug
+        run: ./gradlew --no-daemon assembleDebug
       - uses: actions/upload-artifact@v7
         with:
           name: nectarlink-android-debug
@@ -248,6 +247,6 @@ jobs:
       - uses: actions/checkout@v7
       - name: License headers
         shell: pwsh
-        run: echo "Skipping header check"
+        run: ./scripts/check-headers.ps1
       - name: Dependency policy (licenses, advisories, sources)
         uses: EmbarkStudios/cargo-deny-action@v2
