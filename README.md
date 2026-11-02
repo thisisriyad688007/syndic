@@ -38,10 +38,10 @@ of new features I wanted that I think you'll enjoy having too.
 
 | | Download | Needs |
 |---|---|---|
-| **Windows (x64)** | [Installer (.exe)](https://github.com/thisisriyad688007/syndic/releases/download/v0.1.4/Nectarlink-0.1.4-x64-setup.exe) | Windows 10 (2004+) or 11, 64-bit Intel or AMD (Phone as webcam needs Windows 11) |
+| **Windows (x64)** | [Installer (.exe)](https://github.com/thisisriyad688007/syndic/releases/download/v0.1.4/Syndic-0.1.4-x64-setup.exe) | Windows 10 (2004+) or 11, 64-bit Intel or AMD (Phone as webcam needs Windows 11) |
 | **Windows (ARM64)** | From the next release | Windows 11 on ARM (Snapdragon) |
 | **Linux (x86_64)** | From the next release: [one command](#on-linux), or a .deb, .rpm, AppImage or .tar.gz | Ubuntu 24.04 or newer, Debian 13, Fedora 40 or newer, 64-bit Intel or AMD |
-| **Android** | [App (.apk)](https://github.com/thisisriyad688007/syndic/releases/download/v0.1.4/Nectarlink-0.1.4-android.apk) | Android 8.0 or newer |
+| **Android** | [App (.apk)](https://github.com/thisisriyad688007/syndic/releases/download/v0.1.4/syndic-0.1.4.apk) | Android 8.0 or newer |
 
 The apps update themselves from GitHub Releases and check every download
 against its SHA-256 sums.
