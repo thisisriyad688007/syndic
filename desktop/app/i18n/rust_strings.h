@@ -14,11 +14,6 @@ static const char *const nectarlink_rust_strings[] = {
     QT_TRANSLATE_NOOP("App", "Find my phone"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "My phone's colors"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "My phone's colors (%1)"), // desktop/app/src/bridge/app.rs
-    QT_TRANSLATE_NOOP("App", "Syndic · %1"), // desktop/app/src/bridge/app.rs
-    QT_TRANSLATE_NOOP("App", "Syndic · %1 devices connected"), // desktop/app/src/bridge/app.rs
-    QT_TRANSLATE_NOOP("App", "Syndic · 1 device connected"), // desktop/app/src/bridge/app.rs
-    QT_TRANSLATE_NOOP("App", "Syndic · no devices paired"), // desktop/app/src/bridge/app.rs
-    QT_TRANSLATE_NOOP("App", "Syndic · not connected"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "No phone is paired yet."), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "Open Syndic"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "Open copied link on phone"), // desktop/app/src/bridge/app.rs
@@ -29,6 +24,11 @@ static const char *const nectarlink_rust_strings[] = {
     QT_TRANSLATE_NOOP("App", "Sent text to %1."), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "Some history couldn't be cleared. Try again."), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "Some messages couldn't be cleared. Try again."), // desktop/app/src/bridge/app.rs
+    QT_TRANSLATE_NOOP("App", "Syndic · %1"), // desktop/app/src/bridge/app.rs
+    QT_TRANSLATE_NOOP("App", "Syndic · %1 devices connected"), // desktop/app/src/bridge/app.rs
+    QT_TRANSLATE_NOOP("App", "Syndic · 1 device connected"), // desktop/app/src/bridge/app.rs
+    QT_TRANSLATE_NOOP("App", "Syndic · no devices paired"), // desktop/app/src/bridge/app.rs
+    QT_TRANSLATE_NOOP("App", "Syndic · not connected"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "Take photo with phone"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "That file is no longer in its saved location."), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("App", "The photo couldn't be copied to the clipboard."), // desktop/app/src/bridge/app.rs
@@ -208,10 +208,6 @@ static const char *const nectarlink_rust_strings[] = {
     QT_TRANSLATE_NOOP("Doctor", "It hasn't connected yet."), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "Keep %1 reachable in the background (%2)"), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "Last seen %1."), // desktop/app/src/doctor.rs
-    QT_TRANSLATE_NOOP("Doctor", "Syndic can't show its icon in the top bar"), // desktop/app/src/linux/doctor.rs
-    QT_TRANSLATE_NOOP("Doctor", "Syndic is in the top bar"), // desktop/app/src/linux/doctor.rs
-    QT_TRANSLATE_NOOP("Doctor", "Syndic isn't allowed through Windows Firewall"), // desktop/app/src/doctor.rs
-    QT_TRANSLATE_NOOP("Doctor", "Syndic isn't allowed through the firewall"), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "On Huawei / Honor: open Settings → Battery → App launch, turn off Manage automatically for Syndic, and keep Auto-launch, Secondary launch, and Run in background on."), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "On OnePlus / OxygenOS: open Settings → Apps → App management → Syndic → Battery usage and turn on Allow background activity and Allow auto-launch."), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "On Oppo / Realme: open Settings → Apps → App management → Syndic → Battery usage and turn on Allow background activity and Allow auto-launch."), // desktop/app/src/doctor.rs
@@ -230,6 +226,10 @@ static const char *const nectarlink_rust_strings[] = {
     QT_TRANSLATE_NOOP("Doctor", "Showing this PC's screen needs one more step"), // desktop/app/src/linux/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "Someone chose not to allow it when Windows asked. Allow it, and your phone can connect."), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "Sound is ready"), // desktop/app/src/linux/doctor.rs
+    QT_TRANSLATE_NOOP("Doctor", "Syndic can't show its icon in the top bar"), // desktop/app/src/linux/doctor.rs
+    QT_TRANSLATE_NOOP("Doctor", "Syndic is in the top bar"), // desktop/app/src/linux/doctor.rs
+    QT_TRANSLATE_NOOP("Doctor", "Syndic isn't allowed through Windows Firewall"), // desktop/app/src/doctor.rs
+    QT_TRANSLATE_NOOP("Doctor", "Syndic isn't allowed through the firewall"), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "The firewall blocks Syndic"), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "The firewall is off for this network"), // desktop/app/src/doctor.rs
     QT_TRANSLATE_NOOP("Doctor", "The firewall lets your phone connect"), // desktop/app/src/doctor.rs
@@ -282,9 +282,6 @@ static const char *const nectarlink_rust_strings[] = {
     QT_TRANSLATE_NOOP("Guide", "Messages"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Most Syndic features work in Standard mode with regular Android permissions. Two optional modes unlock deeper system integration:\n\nElevated mode (Wireless debugging or root)\n- Captures the phone screen without showing the Android cast confirmation prompt every time.\n- Streams individual phone apps in separate desktop windows (virtual displays).\n- Controls additional system quick toggles.\n\nAssist mode (Android Accessibility Service)\n- Injects mouse clicks, scrolling, and touch gestures when you control your phone from your PC.\n- Syndic never reads screen text or logs keystrokes through the Accessibility service."), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Nectar Island"), // desktop/app/src/bridge/app.rs
-    QT_TRANSLATE_NOOP("Guide", "Syndic links your Android phone and your PC directly on your local network or over a USB cable.\n\nHow it works\n- Devices discover each other over local Wi-Fi (mDNS) or USB (ADB reverse tunnel) and connect over QUIC (TLS 1.3).\n- Every connection is mutually authenticated using Ed25519 device keys generated on each device.\n- There is no user account, no cloud database, and no telemetry.\n\nCapability tiers on Android\n- Standard mode: Works right after installation with standard Android permissions.\n- Elevated mode (optional): Uses Wireless debugging (set up once in the phone app) or root for phone apps in their own windows, mirroring without the screen capture prompt, and more phone controls.\n- Assist mode (optional): Uses the Android Accessibility service only when you enable Remote input so your PC mouse and keyboard can control the phone."), // desktop/app/src/bridge/app.rs
-    QT_TRANSLATE_NOOP("Guide", "Syndic never asks for every permission up front. Each feature works independently:\n\n- Notification Access: Required only if you want phone notifications, inline replies, and notification-backed chat threads on your PC.\n- SMS and Contacts: Required only if you want to read and send SMS/MMS messages or look up contact names on your PC.\n- Phone and Call Log: Required only if you want incoming call alerts, call history, or dialing from your PC.\n- Media and Photos: Required only if you want the Photos gallery, Shelf latest photo, or folder sync.\n- Camera and Microphone: Required only while streaming your phone as a webcam, taking a Continuity Camera shot, or recording a voice note."), // desktop/app/src/bridge/app.rs
-    QT_TRANSLATE_NOOP("Guide", "Syndic overview"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Notifications"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Phone as speaker"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Phone as webcam"), // desktop/app/src/bridge/app.rs
@@ -297,6 +294,9 @@ static const char *const nectarlink_rust_strings[] = {
     QT_TRANSLATE_NOOP("Guide", "Send files"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Share PC folders"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Share PC screen"), // desktop/app/src/bridge/app.rs
+    QT_TRANSLATE_NOOP("Guide", "Syndic links your Android phone and your PC directly on your local network or over a USB cable.\n\nHow it works\n- Devices discover each other over local Wi-Fi (mDNS) or USB (ADB reverse tunnel) and connect over QUIC (TLS 1.3).\n- Every connection is mutually authenticated using Ed25519 device keys generated on each device.\n- There is no user account, no cloud database, and no telemetry.\n\nCapability tiers on Android\n- Standard mode: Works right after installation with standard Android permissions.\n- Elevated mode (optional): Uses Wireless debugging (set up once in the phone app) or root for phone apps in their own windows, mirroring without the screen capture prompt, and more phone controls.\n- Assist mode (optional): Uses the Android Accessibility service only when you enable Remote input so your PC mouse and keyboard can control the phone."), // desktop/app/src/bridge/app.rs
+    QT_TRANSLATE_NOOP("Guide", "Syndic never asks for every permission up front. Each feature works independently:\n\n- Notification Access: Required only if you want phone notifications, inline replies, and notification-backed chat threads on your PC.\n- SMS and Contacts: Required only if you want to read and send SMS/MMS messages or look up contact names on your PC.\n- Phone and Call Log: Required only if you want incoming call alerts, call history, or dialing from your PC.\n- Media and Photos: Required only if you want the Photos gallery, Shelf latest photo, or folder sync.\n- Camera and Microphone: Required only while streaming your phone as a webcam, taking a Continuity Camera shot, or recording a voice note."), // desktop/app/src/bridge/app.rs
+    QT_TRANSLATE_NOOP("Guide", "Syndic overview"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Timeline"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Troubleshooting and Connection Doctor"), // desktop/app/src/bridge/app.rs
     QT_TRANSLATE_NOOP("Guide", "Type on phone"), // desktop/app/src/bridge/app.rs
