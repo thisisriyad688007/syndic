@@ -382,7 +382,7 @@ fun nectarSwitchColors(): androidx.compose.material3.SwitchColors {
  * plain opaque background.
  */
 @Composable
-fun SyndicTheme(
+fun NectarlinkTheme(
     appearance: Appearance = Appearance(),
     mediaSeedColor: UInt? = null,
     backdrop: Boolean = false,

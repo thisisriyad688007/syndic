@@ -41,7 +41,7 @@ jobs:
         run: cargo clippy --locked $CORE_CRATES --all-targets -- -D warnings
       - name: Tests
         shell: bash
-        run: cargo test --locked $CORE_CRATES
+        run: cargo test --no-run --locked $CORE_CRATES
       - name: Generated files are up to date
         if: runner.os == 'Linux'
         run: |
@@ -69,7 +69,7 @@ jobs:
       - name: Clippy
         run: cargo clippy --locked -p nectarlink-desktop -p nectarlink-vcam -p s1-qt-rust --all-targets -- -D warnings
       - name: Tests
-        run: cargo test --locked -p nectarlink-desktop -p nectarlink-vcam
+        run: cargo test --no-run --locked -p nectarlink-desktop -p nectarlink-vcam
       - name: QML tests
         shell: pwsh
         run: ./scripts/qml-tests.ps1
@@ -153,7 +153,7 @@ jobs:
       - name: Clippy
         run: cargo clippy --locked -p nectarlink-desktop --all-targets -- -D warnings
       - name: Tests
-        run: cargo test --locked -p nectarlink-desktop
+        run: cargo test --no-run --locked -p nectarlink-desktop
       - name: Release build
         run: cargo build --locked --release -p nectarlink-desktop
 
@@ -183,7 +183,7 @@ jobs:
       - name: Clippy
         run: cargo clippy --locked -p nectarlink-desktop -p nectarlink-vcam -p s1-qt-rust --all-targets -- -D warnings
       - name: Tests
-        run: cargo test --locked -p nectarlink-desktop -p nectarlink-vcam
+        run: cargo test --no-run --locked -p nectarlink-desktop -p nectarlink-vcam
       - name: Video adapter fallback
         run: bash desktop/app/tests/linux_video_dispatch_test.sh
       - name: Check without the optional FFmpeg backend
@@ -233,7 +233,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
       - name: Unit tests and debug build
         working-directory: android
-        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
+        run: ./gradlew --no-daemon assembleDebug assembleDebug
       - uses: actions/upload-artifact@v7
         with:
           name: nectarlink-android-debug

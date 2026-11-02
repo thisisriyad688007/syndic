@@ -46,8 +46,8 @@ import app.nectarlink.core.EventListener
 import app.nectarlink.core.FileToSend
 import app.nectarlink.core.MirrorStream
 import app.nectarlink.core.Link
-import app.nectarlink.core.SyndicException
-import app.nectarlink.core.SyndicNode
+import app.nectarlink.core.NectarlinkException
+import app.nectarlink.core.NectarlinkNode
 import app.nectarlink.core.NodeOptions
 import app.nectarlink.core.Notification
 import app.nectarlink.core.PairingFailure
@@ -217,19 +217,19 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
      * Notification changes, in order: a removal must never overtake the post
      * it removes. Runs once the node is up.
      */
-    private val notificationOps = Channel<suspend (SyndicNode) -> Unit>(Channel.UNLIMITED)
+    private val notificationOps = Channel<suspend (NectarlinkNode) -> Unit>(Channel.UNLIMITED)
 
     /**
      * Remote input for PCs, sent one after another: a button's release must
      * never overtake its press (or the PC's button would stay down), nor a
      * laser update its "off".
      */
-    private val remoteOps = Channel<suspend (SyndicNode) -> Unit>(Channel.UNLIMITED)
+    private val remoteOps = Channel<suspend (NectarlinkNode) -> Unit>(Channel.UNLIMITED)
 
     private val opsLock = Any()
     @Volatile private var isRunning = false
 
-    private fun enqueueNotificationOp(op: suspend (SyndicNode) -> Unit) {
+    private fun enqueueNotificationOp(op: suspend (NectarlinkNode) -> Unit) {
         synchronized(opsLock) {
             if (isRunning && node != null) {
                 notificationOps.trySend(op)
@@ -237,7 +237,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         }
     }
 
-    private fun enqueueRemoteOp(op: suspend (SyndicNode) -> Unit) {
+    private fun enqueueRemoteOp(op: suspend (NectarlinkNode) -> Unit) {
         synchronized(opsLock) {
             if (isRunning && node != null) {
                 remoteOps.trySend(op)
@@ -249,7 +249,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 8)
     private val _queuedNotices = MutableSharedFlow<OfflineQueuedNotice>(extraBufferCapacity = 8)
     private val _clipSuggestions = MutableSharedFlow<ClipSuggestionNotice>(extraBufferCapacity = 4)
-    @Volatile private var node: SyndicNode? = null
+    @Volatile private var node: NectarlinkNode? = null
     @Volatile private var startJob: Job? = null
     @Volatile private var runJob: Job? = null
     @Volatile private var runScope: CoroutineScope? = null
@@ -416,8 +416,8 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                 usbPort = 53319u.toUShort(),
             )
             val started = try {
-                SyndicNode.start(options, platform, KeystoreKeyProtector(), this@Core)
-            } catch (e: SyndicException) {
+                NectarlinkNode.start(options, platform, KeystoreKeyProtector(), this@Core)
+            } catch (e: NectarlinkException) {
                 Log.e(TAG, "core failed to start", e)
                 _state.update { it.copy(status = CoreStatus.Failed(e.message ?: e.javaClass.simpleName)) }
                 return@launch
@@ -649,7 +649,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         }
     }
 
-    private suspend fun shutdownAndCloseNode(node: SyndicNode) {
+    private suspend fun shutdownAndCloseNode(node: NectarlinkNode) {
         try {
             node.shutdown()
         } finally {
@@ -1048,14 +1048,14 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                     transferId = tid,
                     delivery = delivery,
                 )
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 val name = _state.value.nameOf(pcId).orEmpty()
                 when (e) {
-                    is SyndicException.Denied -> {
+                    is NectarlinkException.Denied -> {
                         recordings.updateDelivery(recordingId, pcId, null, DeliveryState.Denied)
                         _messages.tryEmit(context.getString(R.string.recorder_denied_text, name))
                     }
-                    is SyndicException.Offline -> {
+                    is NectarlinkException.Offline -> {
                         recordings.updateDelivery(recordingId, pcId, null, DeliveryState.Waiting)
                     }
                     else -> {
@@ -1123,10 +1123,10 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         val node = node ?: return null
         return try {
             node.webcamOpen(pcId)
-        } catch (e: SyndicException) {
+        } catch (e: NectarlinkException) {
             val name = _state.value.nameOf(pcId).orEmpty()
             val msg = when (e) {
-                is SyndicException.Denied -> context.getString(R.string.webcam_denied_text, name)
+                is NectarlinkException.Denied -> context.getString(R.string.webcam_denied_text, name)
                 else -> describe(e)
             }
             _messages.tryEmit(msg)
@@ -1140,7 +1140,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         val node = node ?: return null
         return try {
             node.micOpen(pcId)
-        } catch (e: SyndicException) {
+        } catch (e: NectarlinkException) {
             _messages.tryEmit(describe(e))
             null
         }
@@ -1192,7 +1192,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
     /** Which PCs may browse this phone's storage, and which may not ask for its microphone. */
     private class PerPcToggles(val storageAllowed: Set<String>, val micOff: Set<String>)
 
-    private fun perPcToggles(node: SyndicNode, ids: List<String>): PerPcToggles {
+    private fun perPcToggles(node: NectarlinkNode, ids: List<String>): PerPcToggles {
         val storage = mutableSetOf<String>()
         val micOff = mutableSetOf<String>()
         for (id in ids) {
@@ -1235,7 +1235,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                     height = height.coerceAtLeast(1).toUInt(),
                     data = data,
                 )
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 _messages.tryEmit(describe(e))
             }
         }
@@ -1304,10 +1304,10 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                         ?: returnedId.takeIf { it.isNotBlank() }
                     emitOfflineQueuedNotice(pcId, name, qid)
                 }
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 val name = _state.value.nameOf(pcId).orEmpty()
                 _messages.tryEmit(
-                    if (e is SyndicException.Denied) context.getString(R.string.transfer_off_for, name) else describe(e),
+                    if (e is NectarlinkException.Denied) context.getString(R.string.transfer_off_for, name) else describe(e),
                 )
             }
         }
@@ -1442,7 +1442,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
             val currentNode = node ?: return@launch
             try {
                 currentNode.setLocalsendEnabled(enabled)
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 _messages.tryEmit(describe(e))
             }
             localsendMulticast?.runCatching { if (enabled) acquire() else release() }
@@ -1485,7 +1485,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
 
     /**
      * Automatically sends non-sensitive text copied in the background while Elevated mode is running.
-     * Skips clips Syndic itself wrote from a PC (`PhoneClipboard.isRecentEcho`).
+     * Skips clips NectarLink itself wrote from a PC (`PhoneClipboard.isRecentEcho`).
      */
     fun onElevatedClipboardChanged(text: String, html: String?) {
         if (text.isBlank() || PhoneClipboard.isRecentEcho(text, html)) return
@@ -1534,7 +1534,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
     private suspend fun sendToPcs(
         image: Boolean,
         pcId: String? = null,
-        send: suspend (SyndicNode, String) -> Unit,
+        send: suspend (NectarlinkNode, String) -> Unit,
     ): String {
         startJob?.join()
         val node = node ?: return context.getString(R.string.clip_no_pc)
@@ -1554,13 +1554,13 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                     queuedTo += pc
                     lastQueueId = runCatching { node.latestQueuedIdForPeer(pc.id) }.getOrNull()
                 }
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 failure = when (e) {
-                    is SyndicException.Denied -> context.getString(R.string.clip_off_for, pc.name)
-                    is SyndicException.TooLarge -> context.getString(
+                    is NectarlinkException.Denied -> context.getString(R.string.clip_off_for, pc.name)
+                    is NectarlinkException.TooLarge -> context.getString(
                         if (image) R.string.clip_image_too_large else R.string.clip_too_large,
                     )
-                    is SyndicException.Unsupported ->
+                    is NectarlinkException.Unsupported ->
                         if (image) context.getString(R.string.clip_image_unsupported, pc.name) else describe(e)
                     else -> describe(e)
                 }
@@ -1615,7 +1615,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                     _messages.tryEmit(context.getString(R.string.clipboard_history_copied))
                 }
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 _messages.tryEmit(describe(e))
             }
         }
@@ -1818,7 +1818,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                             refreshSendQueue()
                             emitOfflineQueuedNotice(entry.deviceId, pcName)
                         }
-                    } catch (e: SyndicException) {
+                    } catch (e: NectarlinkException) {
                         _messages.tryEmit(describe(e))
                     }
                 }
@@ -1858,7 +1858,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                                 FileToSend.Path(path = f.absolutePath, name = f.name, folder = null),
                                 emptyList(),
                             )
-                        } catch (e: SyndicException) {
+                        } catch (e: NectarlinkException) {
                             _messages.tryEmit(describe(e))
                         }
                     }
@@ -1943,10 +1943,10 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         _state.update { it.copy(pairing = PairingState.Joining) }
         try {
             it.pairingJoin(link)
-        } catch (e: SyndicException) {
+        } catch (e: NectarlinkException) {
             val failure = when (e) {
-                is SyndicException.InvalidPairingLink -> PairingFailure.Other("not a Syndic code")
-                is SyndicException.Denied -> PairingFailure.Rejected
+                is NectarlinkException.InvalidPairingLink -> PairingFailure.Other("not a NectarLink code")
+                is NectarlinkException.Denied -> PairingFailure.Rejected
                 else -> PairingFailure.Unreachable
             }
             _state.update { s -> s.copy(pairing = PairingState.Failed(failure)) }
@@ -1962,7 +1962,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         val node = node ?: return null
         return try {
             node.pairingStartQr()
-        } catch (e: SyndicException) {
+        } catch (e: NectarlinkException) {
             _messages.tryEmit(describe(e))
             null
         }
@@ -1973,7 +1973,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         _state.update { it.copy(pairing = PairingState.Connecting(peer)) }
         try {
             it.pairingStartNearby(peer)
-        } catch (e: SyndicException) {
+        } catch (e: NectarlinkException) {
             _state.update { s ->
                 if (s.pairing is PairingState.Connecting) s.copy(pairing = PairingState.Failed(PairingFailure.Unreachable)) else s
             }
@@ -2021,8 +2021,8 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
             val message = try {
                 node.pcPower(id, sleep)
                 context.getString(if (sleep) R.string.pc_sleeping else R.string.pc_locked, name)
-            } catch (e: SyndicException) {
-                if (e is SyndicException.Denied) context.getString(R.string.pc_actions_off, name) else describe(e)
+            } catch (e: NectarlinkException) {
+                if (e is NectarlinkException.Denied) context.getString(R.string.pc_actions_off, name) else describe(e)
             }
             _messages.tryEmit(message)
         }
@@ -2060,12 +2060,12 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
             try {
                 node.wake(id)
                 node.refresh()
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 wakeTimers.remove(id)?.cancel()
                 _state.update { it.withWakeState(id, WakeState.Idle) }
                 val name = _state.value.nameOf(id).orEmpty()
                 val msg = when (e) {
-                    is SyndicException.Unsupported -> context.getString(R.string.wake_not_ready, name)
+                    is NectarlinkException.Unsupported -> context.getString(R.string.wake_not_ready, name)
                     else -> describe(e)
                 }
                 _messages.tryEmit(msg)
@@ -2108,7 +2108,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                 )
                 msg
             }
-        } catch (e: SyndicException) {
+        } catch (e: NectarlinkException) {
             describe(e)
         }
     }
@@ -2122,10 +2122,10 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         return try {
             node.remoteCheck(id)
             RemoteAccess.Allowed
-        } catch (e: SyndicException) {
+        } catch (e: NectarlinkException) {
             when (e) {
-                is SyndicException.Denied -> RemoteAccess.Denied
-                is SyndicException.Unsupported -> RemoteAccess.Unsupported
+                is NectarlinkException.Denied -> RemoteAccess.Denied
+                is NectarlinkException.Unsupported -> RemoteAccess.Unsupported
                 else -> RemoteAccess.Offline
             }
         }
@@ -2247,15 +2247,15 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         enqueueRemoteOp { runCatching { it.sendPcMirrorInput(id, input) } }
     }
 
-    private fun remoteCommand(onStatus: ((RemoteAccess) -> Unit)?, block: suspend (SyndicNode) -> Unit) {
+    private fun remoteCommand(onStatus: ((RemoteAccess) -> Unit)?, block: suspend (NectarlinkNode) -> Unit) {
         enqueueRemoteOp { node ->
             try {
                 block(node)
                 onStatus?.invoke(RemoteAccess.Allowed)
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 val status = when (e) {
-                    is SyndicException.Denied -> RemoteAccess.Denied
-                    is SyndicException.Unsupported -> RemoteAccess.Unsupported
+                    is NectarlinkException.Denied -> RemoteAccess.Denied
+                    is NectarlinkException.Unsupported -> RemoteAccess.Unsupported
                     else -> RemoteAccess.Offline
                 }
                 onStatus?.invoke(status)
@@ -2274,11 +2274,11 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         return try {
             node.deckPress(id, tile)
             DeckPressResult.Ok
-        } catch (e: SyndicException) {
+        } catch (e: NectarlinkException) {
             when (e) {
-                is SyndicException.Denied -> DeckPressResult.Denied
-                is SyndicException.Offline -> DeckPressResult.Offline
-                is SyndicException.NotFound -> DeckPressResult.NotFound
+                is NectarlinkException.Denied -> DeckPressResult.Denied
+                is NectarlinkException.Offline -> DeckPressResult.Offline
+                is NectarlinkException.NotFound -> DeckPressResult.NotFound
                 else -> {
                     _messages.tryEmit(describe(e))
                     DeckPressResult.Failed
@@ -2305,7 +2305,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
                     } else {
                         current.outputDevices + app.nectarlink.core.AudioOutputDevice(
                             id = PHONE_SPEAKER_OUTPUT,
-                            name = "Phone speaker (Syndic)",
+                            name = "Phone speaker (NectarLink)",
                             isDefault = false,
                         )
                     }
@@ -2329,11 +2329,11 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
         enqueueRemoteOp { node ->
             try {
                 node.setPcAudio(id, wireVol, muted)
-            } catch (e: SyndicException) {
-                if (e is SyndicException.Denied) {
+            } catch (e: NectarlinkException) {
+                if (e is NectarlinkException.Denied) {
                     val name = _state.value.nameOf(id).orEmpty()
                     _messages.tryEmit(context.getString(R.string.remote_denied_title, name))
-                } else if (e !is SyndicException.Offline) {
+                } else if (e !is NectarlinkException.Offline) {
                     _messages.tryEmit(describe(e))
                 }
             }
@@ -2385,7 +2385,7 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
      * Blocks; call off the main thread.
      */
     fun readWatchFile(pcId: String, offset: Long, length: Long): ByteArray {
-        val running = node ?: throw java.io.IOException("Syndic isn't running")
+        val running = node ?: throw java.io.IOException("NectarLink isn't running")
         return running.watchFileRead(pcId, offset.toULong(), length.toULong()).data
     }
 
@@ -2399,15 +2399,15 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
             startJob?.join()
             val folder = try {
                 PcFolder(node?.listRemoteStorage(deviceId, path).orEmpty())
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 Log.i(TAG, "can't list a PC's folder: $e")
                 PcFolder(
                     emptyList(),
                     when (e) {
-                        is SyndicException.Denied -> R.string.pc_files_not_shared
-                        is SyndicException.Offline, is SyndicException.NotPaired -> R.string.pc_files_offline
-                        is SyndicException.Unsupported -> R.string.pc_files_update
-                        is SyndicException.NotFound -> R.string.pc_files_not_found
+                        is NectarlinkException.Denied -> R.string.pc_files_not_shared
+                        is NectarlinkException.Offline, is NectarlinkException.NotPaired -> R.string.pc_files_offline
+                        is NectarlinkException.Unsupported -> R.string.pc_files_update
+                        is NectarlinkException.NotFound -> R.string.pc_files_not_found
                         else -> R.string.pc_files_error
                     },
                 )
@@ -2486,31 +2486,31 @@ class Core(context: Context, private val scope: CoroutineScope) : EventListener 
     }
 
     /** Runs a command on the node, turning errors into a message. */
-    private fun command(block: suspend (SyndicNode) -> Unit) {
+    private fun command(block: suspend (NectarlinkNode) -> Unit) {
         scope.launch {
             startJob?.join()
             val node = node ?: return@launch
             try {
                 block(node)
-            } catch (e: SyndicException) {
+            } catch (e: NectarlinkException) {
                 _messages.tryEmit(describe(e))
             }
         }
     }
 
-    private fun describe(e: SyndicException): String = when (e) {
-        is SyndicException.Offline -> context.getString(R.string.error_not_connected)
-        is SyndicException.NotPaired -> context.getString(R.string.error_not_paired)
-        is SyndicException.Timeout -> context.getString(R.string.error_timed_out)
-        is SyndicException.Unsupported -> context.getString(R.string.error_unsupported)
-        is SyndicException.QueueFull -> e.reason.ifBlank { context.getString(R.string.send_queue_full) }
+    private fun describe(e: NectarlinkException): String = when (e) {
+        is NectarlinkException.Offline -> context.getString(R.string.error_not_connected)
+        is NectarlinkException.NotPaired -> context.getString(R.string.error_not_paired)
+        is NectarlinkException.Timeout -> context.getString(R.string.error_timed_out)
+        is NectarlinkException.Unsupported -> context.getString(R.string.error_unsupported)
+        is NectarlinkException.QueueFull -> e.reason.ifBlank { context.getString(R.string.send_queue_full) }
         else -> context.getString(R.string.error_generic)
     }
 
     enum class RemoteAccess { Allowed, Denied, Offline, Unsupported }
 
     private companion object {
-        const val TAG = "Syndic"
+        const val TAG = "Nectarlink"
         /** Offered while notification access is granted (docs/protocol/capabilities.md). */
         val NOTIFICATION_CAPABILITIES = listOf("notify.mirror", "notify.reply", "notify.live")
         /** Sharing this phone's players, which also needs notification access. */

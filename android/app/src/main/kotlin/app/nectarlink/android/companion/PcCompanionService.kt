@@ -6,7 +6,7 @@ import android.companion.CompanionDeviceService
 import android.companion.DevicePresenceEvent
 import android.os.Build
 import androidx.annotation.RequiresApi
-import app.nectarlink.android.SyndicApplication
+import app.nectarlink.android.NectarlinkApplication
 import app.nectarlink.android.service.ConnectionService
 
 /**
@@ -48,6 +48,6 @@ class PcCompanionService : CompanionDeviceService() {
             return
         }
         ConnectionService.start(appContext)
-        (appContext as? SyndicApplication)?.core?.reconnectNow()
+        (appContext as? NectarlinkApplication)?.core?.reconnectNow()
     }
 }

@@ -19,7 +19,7 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import app.nectarlink.android.SyndicApplication
+import app.nectarlink.android.NectarlinkApplication
 import app.nectarlink.android.R
 import app.nectarlink.android.banking.BankingPause
 import app.nectarlink.android.banking.PauseDecider
@@ -58,7 +58,7 @@ class ConnectionService : LifecycleService() {
         app.nectarlink.android.notifications.TaskNotifications.createChannels(this)
         app.nectarlink.android.webcam.WebcamService.createChannel(this)
         app.nectarlink.android.webcam.WebcamRequests.createChannel(this)
-        val core = (application as SyndicApplication).core
+        val core = (application as NectarlinkApplication).core
         if (!startInForeground(core.state.value)) {
             stopSelf()
             return
@@ -83,7 +83,7 @@ class ConnectionService : LifecycleService() {
         // Updates while the app is in the background (they install by themselves when
         // allowed). AppUpdater checks at most once a day, so waking now and then is cheap.
         lifecycleScope.launch {
-            val updater = (application as SyndicApplication).updater
+            val updater = (application as NectarlinkApplication).updater
             while (true) {
                 runCatching { updater.updateIfDue() }.onFailure { Log.i(TAG, "update check failed", it) }
                 delay(UPDATE_WAKE_MS)
@@ -129,11 +129,11 @@ class ConnectionService : LifecycleService() {
             Preferences.setBackgroundServiceEnabled(this, false)
             stopSelf()
             getSystemService(NotificationManager::class.java)?.cancel(ONGOING_ID)
-            (application as? SyndicApplication)?.onBackgroundServiceDisabled()
+            (application as? NectarlinkApplication)?.onBackgroundServiceDisabled()
             return START_NOT_STICKY
         }
         if (intent?.action == ACTION_STOP_RINGING) {
-            (application as SyndicApplication).core.stopRinging()
+            (application as NectarlinkApplication).core.stopRinging()
         }
         return START_STICKY
     }
@@ -259,7 +259,7 @@ class ConnectionService : LifecycleService() {
     )
 
     companion object {
-        private const val TAG = "Syndic"
+        private const val TAG = "Nectarlink"
         private const val UPDATE_WAKE_MS = 6L * 3600 * 1000
         /** How often to look at the app in front while the screen is on and Pause for banking apps is set up. */
         private const val BANKING_POLL_MS = 800L
