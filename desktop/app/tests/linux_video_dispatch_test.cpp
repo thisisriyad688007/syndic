@@ -23,7 +23,7 @@ extern "C" bool nectarlink_video_decoder_next_device(void* p, char*, size_t) { r
 extern "C" const char* nectarlink_video_decoder_backend(const void*) { return TEST_LABEL; }
 extern "C" int nectarlink_video_decoder_send(void* p, const uint8_t*, size_t n, char*, size_t)
 { return p == &object ? static_cast<int>(n) : -1; }
-extern "C" int nectarlink_video_decoder_receive(void*, NectarlinkDecodedNv12*, char*, size_t) { return 0; }
+extern "C" int nectarlink_video_decoder_receive(void*, SyndicDecodedNv12*, char*, size_t) { return 0; }
 extern "C" void nectarlink_video_decoder_flush(void*) {}
 extern "C" void* nectarlink_video_encoder_create(bool, int, int, int, int, char*, size_t)
 {
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
     const uint8_t data[] = {1, 2, 3};
     assert(nectarlink_video_encoder_send(encoder, data, sizeof(data), 0, error, sizeof(error)) == 3);
     assert(nectarlink_video_decoder_send(decoder, data, sizeof(data), error, sizeof(error)) == 3);
-    NectarlinkDecodedNv12 frame{};
+    SyndicDecodedNv12 frame{};
     assert(nectarlink_video_decoder_receive(decoder, &frame, error, sizeof(error)) == 0);
     const uint8_t* packet = nullptr;
     size_t length = 0;

@@ -214,13 +214,13 @@ BEGIN
   BEGIN
     BLOCK "040904B0"
     BEGIN
-      VALUE "CompanyName", "The NectarLink contributors"
-      VALUE "FileDescription", "NectarLink"
+      VALUE "CompanyName", "The Syndic contributors"
+      VALUE "FileDescription", "Syndic"
       VALUE "FileVersion", "{version}"
       VALUE "InternalName", "nectarlink-desktop"
       VALUE "LegalCopyright", "GPL-3.0-or-later"
       VALUE "OriginalFilename", "nectarlink-desktop.exe"
-      VALUE "ProductName", "NectarLink"
+      VALUE "ProductName", "Syndic"
       VALUE "ProductVersion", "{version}"
     END
   END

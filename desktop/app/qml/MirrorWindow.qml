@@ -22,7 +22,7 @@ Window {
 
     visible: true
     title: info.app ? qsTr("%1 · %2").arg(info.title).arg(deviceName)
-         : deviceName.length > 0 ? qsTr("%1 · NectarLink").arg(deviceName) : qsTr("Phone screen · NectarLink")
+         : deviceName.length > 0 ? qsTr("%1 · Syndic").arg(deviceName) : qsTr("Phone screen · Syndic")
     color: "black"
     minimumWidth: 240
     minimumHeight: 240
@@ -115,7 +115,7 @@ Window {
         stream: win.mirrorKey
         windowIcon: win.info.icon || ""
         windowAppId: win.info.app && (win.info.pkg || "").length > 0
-            ? "Nectarlink.App." + (win.info.device || "").slice(0, 8) + "." + win.info.pkg
+            ? "Syndic.App." + (win.info.device || "").slice(0, 8) + "." + win.info.pkg
             : ""
         focus: true
         acceptsText: win.phase === "showing" && win.canControl
@@ -499,7 +499,7 @@ Window {
             wrapMode: Text.WordWrap
             role: "bodySmall"
             color: "white"
-            text: qsTr("To control the phone, turn on Control from your PC in NectarLink's settings on the phone.")
+            text: qsTr("To control the phone, turn on Control from your PC in Syndic's settings on the phone.")
         }
         Button {
             id: notifyPhoneBtn

@@ -10,18 +10,18 @@
 
 use std::path::{Path, PathBuf};
 
-/// The command-line flag Jump List tasks pass back to NectarLink.
+/// The command-line flag Jump List tasks pass back to Syndic.
 pub const ARG: &str = "--task";
 
 /// Jump-list tasks exposed on the launcher / dock right-click menu.
 /// Kept in parity with the Windows Jump List (`win/jumplist.rs`) and
-/// `bridge::app::NectarLinkApp::dispatch_jump_task`.
+/// `bridge::app::SyndicApp::dispatch_jump_task`.
 pub const TASKS: &[(&str, &str, &str)] = &[
     ("send-files", "Send files to phone", "Open the file picker to send files to your phone"),
     ("send-clipboard", "Send clipboard to phone", "Send what's currently copied on this PC to your phone"),
     ("find-phone", "Find my phone", "Make your paired phone ring"),
     ("take-photo", "Take photo with phone", "Capture a photo with your phone camera and paste it here"),
-    ("open-timeline", "Open Timeline", "Open the chronological activity feed in NectarLink"),
+    ("open-timeline", "Open Timeline", "Open the chronological activity feed in Syndic"),
 ];
 
 fn applications_dir() -> Option<PathBuf> {
@@ -75,7 +75,7 @@ pub fn build_desktop_file(exe: &Path, icon_path: &Path, custom_data_dir: Option<
         "[Desktop Entry]\n\
          Type=Application\n\
          Version=1.1\n\
-         Name=NectarLink\n\
+         Name=Syndic\n\
          GenericName=Phone Companion\n\
          Comment=Connect your Android phone and Linux PC\n\
          Exec=\"{exe_str}\" %U\n\
@@ -165,9 +165,9 @@ mod tests {
 
     #[test]
     fn custom_profile_quotes_data_dir() {
-        let p = Path::new("/home/Alice Smith/.local/share/NectarLink Dev");
+        let p = Path::new("/home/Alice Smith/.local/share/Syndic Dev");
         let args = build_task_arguments("find-phone", Some(p));
-        assert_eq!(args, "--data-dir \"/home/Alice Smith/.local/share/NectarLink Dev\" --task find-phone");
+        assert_eq!(args, "--data-dir \"/home/Alice Smith/.local/share/Syndic Dev\" --task find-phone");
     }
 
     #[test]

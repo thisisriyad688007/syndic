@@ -118,14 +118,14 @@ fn run(updates: mpsc::Receiver<Option<Shown>>) -> windows::core::Result<()> {
             cbSize: std::mem::size_of::<WNDCLASSEXW>() as u32,
             lpfnWndProc: Some(window_proc),
             hInstance: instance.into(),
-            lpszClassName: w!("Nectarlink.Media"),
+            lpszClassName: w!("Syndic.Media"),
             ..Default::default()
         };
         RegisterClassExW(&class);
         CreateWindowExW(
             WINDOW_EX_STYLE(0),
-            w!("Nectarlink.Media"),
-            w!("NectarLink media"),
+            w!("Syndic.Media"),
+            w!("Syndic media"),
             WS_OVERLAPPED,
             0,
             0,

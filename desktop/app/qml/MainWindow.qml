@@ -119,7 +119,7 @@ NativeWindow {
 
     width: normalWidth
     height: normalHeight
-    title: "NectarLink"
+    title: "Syndic"
 
     function screenKey(s) {
         if (!s) return ""

@@ -68,7 +68,7 @@ pub struct Update {
 }
 
 /// The scheduled task the installer registers (see the module docs).
-pub const TASK: &str = "Nectarlink Update";
+pub const TASK: &str = "Syndic Update";
 /// What the task runs: `nectarlink-desktop.exe --update-service`.
 pub const SERVICE_ARG: &str = "--update-service";
 /// How long nobody may have used the PC before an update installs by itself.
@@ -162,9 +162,9 @@ pub fn check_now(told: bool) -> Option<String> {
             if new {
                 announce(&update);
             }
-            Some(tr!("Updater", "NectarLink %1 is available.", update.version))
+            Some(tr!("Updater", "Syndic %1 is available.", update.version))
         }
-        Ok(None) => told.then(|| tr!("Updater", "NectarLink is up to date.")),
+        Ok(None) => told.then(|| tr!("Updater", "Syndic is up to date.")),
         Err(e) => {
             tracing::info!(error = %e, "couldn't check for updates");
             told.then(|| tr!("Updater", "Couldn't check for updates. Check your internet connection."))
@@ -176,9 +176,9 @@ fn announce(update: &Update) {
     toast::show(toast::Toast {
         device: TOAST_GROUP.into(),
         key: update.version.clone(),
-        title: tr!("Updater", "NectarLink %1 is available", update.version),
+        title: tr!("Updater", "Syndic %1 is available", update.version),
         body: tr!("Updater", "Update now, or later from Settings."),
-        attribution: "NectarLink".into(),
+        attribution: "Syndic".into(),
         icon: None,
         image: None,
         actions: vec![(ACTION_UPDATE.into(), "Update".into())],
@@ -336,7 +336,7 @@ fn newer_release_for(release: Release, current: &str, suffix: &str) -> Option<Up
     // The name becomes a file name under %TEMP%: a plain name only, never a path.
     let installer = release.assets.iter().find(|a| {
         a.name.ends_with(suffix)
-            && (a.name.starts_with("Nectarlink-")
+            && (a.name.starts_with("Syndic-")
                 || a.name.starts_with("nectarlink_")
                 || a.name.starts_with("nectarlink-"))
             && a.name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '.' | '_'))
@@ -491,7 +491,7 @@ impl std::fmt::Display for StageError {
 }
 
 /// Where the app leaves a downloaded installer for the task:
-/// `%ProgramData%\Nectarlink\updates`. Anyone may write here; the task only
+/// `%ProgramData%\Syndic\updates`. Anyone may write here; the task only
 /// runs a copy that matches the release's own sums.
 #[cfg(windows)]
 fn staging_dir() -> PathBuf {
@@ -499,7 +499,7 @@ fn staging_dir() -> PathBuf {
         .map(PathBuf::from)
         .filter(|p| p.is_absolute())
         .unwrap_or_else(|| PathBuf::from(r"C:\ProgramData"))
-        .join("Nectarlink")
+        .join("Syndic")
         .join("updates")
 }
 
@@ -667,14 +667,14 @@ fn relauncher_script(exe: &str, version: &str, arguments: &str) -> String {
         format!("Start-Process -FilePath '{exe}' -ArgumentList '{arguments}'")
     };
     format!(
-        "$key = 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Nectarlink'\n\
+        "$key = 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Syndic'\n\
          $log = Join-Path (Split-Path -Parent '{exe}') 'update.log'\n\
          $since = Get-Date\n\
          $deadline = $since.AddMinutes(10)\n\
          Start-Sleep -Seconds 3\n\
          while ((Get-Date) -lt $deadline) {{\n\
            $installed = (Get-ItemProperty -Path $key -Name DisplayVersion -ErrorAction SilentlyContinue).DisplayVersion\n\
-           $running = Get-Process -ErrorAction SilentlyContinue | Where-Object {{ $_.Name -like 'Nectarlink-*-setup' }}\n\
+           $running = Get-Process -ErrorAction SilentlyContinue | Where-Object {{ $_.Name -like 'Syndic-*-setup' }}\n\
            if ($installed -eq '{version}' -and -not $running) {{ break }}\n\
            $logged = Get-Item -LiteralPath $log -ErrorAction SilentlyContinue\n\
            if ($logged -and $logged.LastWriteTime -gt $since -and -not $running) {{\n\
@@ -761,7 +761,7 @@ pub fn run_service() -> ExitCode {
                 .args([
                     "-e",
                     "-c",
-                    "tar -C \"$2\" -xzf \"$1\" && set -- \"$2\"/Nectarlink-*/install.sh && [ -x \"$1\" ] && \"$1\"",
+                    "tar -C \"$2\" -xzf \"$1\" && set -- \"$2\"/Syndic-*/install.sh && [ -x \"$1\" ] && \"$1\"",
                     "sh",
                 ])
                 .arg(&path)
@@ -875,7 +875,7 @@ fn install_with_prompt(update: &Update, staged: &Path) -> Result<(), String> {
         tr!("Updater", "The update couldn't be started. Try again.")
     };
     let expected = expected_hash(update).map_err(|e| e.for_user())?;
-    let dir = std::env::temp_dir().join("Nectarlink update");
+    let dir = std::env::temp_dir().join("Syndic update");
     let path: PathBuf = dir.join(&update.installer_name);
     std::fs::create_dir_all(&dir)
         .and_then(|()| match std::fs::remove_file(&path) {
@@ -942,7 +942,7 @@ dst=\"$dir/nectarlink-update.tar.gz\"\n\
 install -m 0600 -o 0 -g 0 \"$1\" \"$dst\"\n\
 printf '%s  %s\\n' \"$2\" \"$dst\" | sha256sum -c --status -\n\
 tar -C \"$dir\" -xzf \"$dst\"\n\
-set -- \"$dir\"/Nectarlink-*/install.sh\n\
+set -- \"$dir\"/Syndic-*/install.sh\n\
 [ -x \"$1\" ] && \"$1\"\n";
 
 /// Starts the new version once this one has quit. If that can't be arranged
@@ -952,7 +952,7 @@ set -- \"$dir\"/Nectarlink-*/install.sh\n\
 fn relaunch_after_install(exe: &Path, version: &str) -> Result<(), String> {
     spawn_relauncher(exe, version, true).map_err(|e| {
         tracing::warn!(error = e, "installed, but can't start the new version");
-        tr!("Updater", "The update is installed. Restart NectarLink to use it.")
+        tr!("Updater", "The update is installed. Restart Syndic to use it.")
     })
 }
 
@@ -1050,7 +1050,7 @@ fn install_with_prompt(update: &Update, staged: &Path) -> Result<(), String> {
                 .args([
                     "-e",
                     "-c",
-                    "tar -C \"$2\" -xzf \"$1\" && set -- \"$2\"/Nectarlink-*/install.sh && [ -x \"$1\" ] && \"$1\"",
+                    "tar -C \"$2\" -xzf \"$1\" && set -- \"$2\"/Syndic-*/install.sh && [ -x \"$1\" ] && \"$1\"",
                     "sh",
                 ])
                 .arg(staged)
@@ -1110,7 +1110,7 @@ pub fn announce_update(previous: String, shown: bool) {
     tracing::info!(from = previous, to = current, "updated");
     after_start(
         shown,
-        tr!("Updater", "NectarLink is updated to %1", current),
+        tr!("Updater", "Syndic is updated to %1", current),
         tr!("Updater", "Your phone reconnects on its own."),
     );
 }
@@ -1122,7 +1122,7 @@ pub fn announce_update_failed(shown: bool) {
     after_start(
         shown,
         tr!("Updater", "The update didn't install"),
-        tr!("Updater", "NectarLink is still on the version you had. Try again from Settings."),
+        tr!("Updater", "Syndic is still on the version you had. Try again from Settings."),
     );
 }
 
@@ -1138,7 +1138,7 @@ fn after_start(shown: bool, title: String, body: String) {
             key: "updated".into(),
             title,
             body,
-            attribution: "NectarLink".into(),
+            attribution: "Syndic".into(),
             icon: None,
             image: None,
             actions: Vec::new(),
@@ -1190,17 +1190,17 @@ mod tests {
             prerelease: false,
             assets: vec![
                 Asset {
-                    name: "Nectarlink-9.0.0-x64-setup.exe".into(),
+                    name: "Syndic-9.0.0-x64-setup.exe".into(),
                     browser_download_url: "https://github.com/thtbee/nectarlink/releases/download/v9/setup"
                         .into(),
                 },
                 Asset {
-                    name: "Nectarlink-9.0.0-arm64-setup.exe".into(),
+                    name: "Syndic-9.0.0-arm64-setup.exe".into(),
                     browser_download_url:
                         "https://github.com/thtbee/nectarlink/releases/download/v9/setup-arm64".into(),
                 },
                 Asset {
-                    name: "Nectarlink-9.0.0-x86_64.AppImage".into(),
+                    name: "Syndic-9.0.0-x86_64.AppImage".into(),
                     browser_download_url:
                         "https://github.com/thtbee/nectarlink/releases/download/v9/appimage-x64".into(),
                 },
@@ -1226,16 +1226,16 @@ mod tests {
     #[test]
     fn the_relauncher_waits_for_the_version_then_opens_the_app() {
         let script = relauncher_script(
-            r"C:\Program Files\Nectarlink\nectarlink-desktop.exe",
+            r"C:\Program Files\Syndic\nectarlink-desktop.exe",
             "0.2.0",
             "--minimized --updated",
         );
         assert!(script.contains("$installed -eq '0.2.0'"));
-        assert!(script.contains("Nectarlink-*-setup"));
+        assert!(script.contains("Syndic-*-setup"));
         assert!(script.contains(
-            r"Start-Process -FilePath 'C:\Program Files\Nectarlink\nectarlink-desktop.exe' -ArgumentList '--minimized --updated'"
+            r"Start-Process -FilePath 'C:\Program Files\Syndic\nectarlink-desktop.exe' -ArgumentList '--minimized --updated'"
         ));
-        let shown = relauncher_script(r"C:\Program Files\Nectarlink\nectarlink-desktop.exe", "0.2.0", "");
+        let shown = relauncher_script(r"C:\Program Files\Syndic\nectarlink-desktop.exe", "0.2.0", "");
         assert!(!shown.contains("-ArgumentList"));
     }
 
@@ -1260,13 +1260,13 @@ mod tests {
     fn the_relauncher_refuses_paths_and_versions_that_could_break_its_quotes() {
         let odd = Path::new(r"C:\Program Files\it's\nectarlink-desktop.exe");
         assert!(spawn_relauncher(odd, "0.2.0", false).is_err());
-        let fine = Path::new(r"C:\Program Files\Nectarlink\nectarlink-desktop.exe");
+        let fine = Path::new(r"C:\Program Files\Syndic\nectarlink-desktop.exe");
         assert!(spawn_relauncher(fine, "0.2.0'; Remove-Item x; '", false).is_err());
     }
 
     #[test]
     fn installer_names_that_are_not_plain_file_names_are_refused() {
-        for name in [r"..\..\evil-x64-setup.exe", "Nectarlink-9/../x-x64-setup.exe", "evil-x64-setup.exe"] {
+        for name in [r"..\..\evil-x64-setup.exe", "Syndic-9/../x-x64-setup.exe", "evil-x64-setup.exe"] {
             let mut r = release("v9.0.0");
             r.assets[0].name = name.into();
             assert!(newer_release_for(r, "0.0.1", "-x64-setup.exe").is_none(), "{name}");
@@ -1284,7 +1284,7 @@ mod tests {
         assert_eq!(
             (arm64.installer_name.as_str(), arm64.installer_url.as_str()),
             (
-                "Nectarlink-9.0.0-arm64-setup.exe",
+                "Syndic-9.0.0-arm64-setup.exe",
                 "https://github.com/thtbee/nectarlink/releases/download/v9/setup-arm64"
             )
         );
@@ -1314,7 +1314,7 @@ mod tests {
         assert_eq!(
             (appimage.installer_name.as_str(), appimage.installer_url.as_str()),
             (
-                "Nectarlink-9.0.0-x86_64.AppImage",
+                "Syndic-9.0.0-x86_64.AppImage",
                 "https://github.com/thtbee/nectarlink/releases/download/v9/appimage-x64"
             )
         );
@@ -1360,8 +1360,8 @@ mod tests {
     #[test]
     fn finds_the_installer_hash() {
         let hash = "a".repeat(64);
-        let sums = format!("{hash}  Nectarlink-9.0.0-x64-setup.exe\n{}  other.txt\n", "b".repeat(64));
-        assert_eq!(listed_hash(&sums, "Nectarlink-9.0.0-x64-setup.exe"), Some(hash));
+        let sums = format!("{hash}  Syndic-9.0.0-x64-setup.exe\n{}  other.txt\n", "b".repeat(64));
+        assert_eq!(listed_hash(&sums, "Syndic-9.0.0-x64-setup.exe"), Some(hash));
         assert_eq!(listed_hash(&sums, "missing.exe"), None);
         assert_eq!(listed_hash(&format!("{}  *x.exe", "C".repeat(64)), "x.exe"), Some("c".repeat(64)));
     }
