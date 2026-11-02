@@ -15,7 +15,7 @@ build_adapter() {
     local version="$1" checksum="$2" major="${1%%.*}"
     local archive="${cache}/ffmpeg-${version}.tar.xz"
     if [[ ! -f "${archive}" ]] || ! echo "${checksum}  ${archive}" | sha256sum -c --status; then
-        curl -fsSL "https://ffmpeg.org/releases/ffmpeg-${version}.tar.xz" -o "${archive}.tmp"
+        curl --retry 5 --retry-delay 3 --retry-all-errors -fsSL "https://ffmpeg.org/releases/ffmpeg-${version}.tar.xz" -o "${archive}.tmp"
         echo "${checksum}  ${archive}.tmp" | sha256sum -c -
         mv "${archive}.tmp" "${archive}"
     fi

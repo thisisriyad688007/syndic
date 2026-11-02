@@ -214,3 +214,13 @@ dependencies {
     implementation(libs.jna) { artifact { type = "aar" } }
     testImplementation(libs.junit)
 }
+
+// Fallback signing config for release in fork builds
+android {
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+        }
+    }
+}

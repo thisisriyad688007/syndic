@@ -4,7 +4,7 @@
 # Installs NectarLink on Linux, with everything it needs, and shows each step
 # as it goes:
 #
-#   curl -fsSL https://github.com/thtbee/nectarlink/releases/latest/download/install.sh | sh
+#   curl --retry 5 --retry-delay 3 --retry-all-errors -fsSL https://github.com/thtbee/nectarlink/releases/latest/download/install.sh | sh
 #
 # It picks the package that fits this system (.deb with apt, .rpm with dnf
 # or zypper, the tarball elsewhere), checks it against the release's
@@ -105,8 +105,8 @@ usage() {
     cat <<EOF
 Installs NectarLink on Linux, with everything it needs.
 
-  curl -fsSL https://github.com/$REPO/releases/latest/download/install.sh | sh
-  curl -fsSL https://github.com/$REPO/releases/latest/download/install.sh | sh -s -- [options]
+  curl --retry 5 --retry-delay 3 --retry-all-errors -fsSL https://github.com/$REPO/releases/latest/download/install.sh | sh
+  curl --retry 5 --retry-delay 3 --retry-all-errors -fsSL https://github.com/$REPO/releases/latest/download/install.sh | sh -s -- [options]
 
 Options:
   --uninstall        Remove NectarLink and the system settings this added
@@ -238,7 +238,7 @@ fetch() {
     if [ -n "${NECTARLINK_ASSETS_DIR:-}" ]; then
         cp "$NECTARLINK_ASSETS_DIR/${1##*/}" "$2"
     elif has curl; then
-        curl -fsSL --retry 3 -o "$2" "$1"
+        curl --retry 5 --retry-delay 3 --retry-all-errors -fsSL --retry 3 -o "$2" "$1"
     elif has wget; then
         wget -q -O "$2" "$1"
     else
