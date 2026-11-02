@@ -550,9 +550,7 @@ pub fn install_update_in_background() {
             let _ = qt.queue(move |mut object| match result {
                 Ok(()) => {
                     object.as_mut().set_update_progress(-1.0);
-                    object
-                        .as_mut()
-                        .set_update_status(QString::from("Installing. Syndic reopens by itself."));
+                    object.as_mut().set_update_status(QString::from("Installing. Syndic reopens by itself."));
                 }
                 Err(message) => {
                     object.as_mut().set_update_busy(false);
@@ -1287,10 +1285,8 @@ impl qobject::AppController {
         let mut tooltip = match (devices, online) {
             (0, _) => tr!("App", "Syndic · no devices paired"),
             (_, 0) => tr!("App", "Syndic · not connected"),
-            (_, 1) => battery.map_or_else(
-                || tr!("App", "Syndic · 1 device connected"),
-                |b| tr!("App", "Syndic · %1", b),
-            ),
+            (_, 1) => battery
+                .map_or_else(|| tr!("App", "Syndic · 1 device connected"), |b| tr!("App", "Syndic · %1", b)),
             (_, n) => tr!("App", "Syndic · %1 devices connected", n),
         };
         if waiting_count > 0 {

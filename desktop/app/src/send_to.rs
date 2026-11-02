@@ -583,10 +583,7 @@ mod tests {
         let (a, b, c) = (DeviceId([1; 32]), DeviceId([2; 32]), DeviceId([3; 32]));
 
         reconcile(dir.path(), &[(a, "Pixel".into()), (b, "Tab".into()), (c, "Pixel".into())], &exe).unwrap();
-        assert_eq!(
-            names(dir.path()),
-            ["Pixel (Syndic).lnk", "Pixel.lnk", "Tab (Syndic).lnk", "Tab.lnk"]
-        );
+        assert_eq!(names(dir.path()), ["Pixel (Syndic).lnk", "Pixel.lnk", "Tab (Syndic).lnk", "Tab.lnk"]);
         assert_eq!(shortcut::arguments(&dir.path().join("Pixel.lnk")).unwrap(), format!("{ARG} {a}"));
         assert_eq!(
             shortcut::arguments(&dir.path().join("Pixel (Syndic).lnk")).unwrap(),

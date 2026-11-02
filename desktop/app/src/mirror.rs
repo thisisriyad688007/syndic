@@ -958,10 +958,9 @@ fn request(window: Window, options: MirrorStart) {
         if let Err(e) = node.mirror_start(window.device, options).await {
             let reason = match e {
                 Error::Denied => tr!("Mirror", "Mirroring is turned off for this phone."),
-                Error::Unsupported if app => tr!(
-                    "Mirror",
-                    "Set up Wireless debugging in Syndic on the phone to open its apps here."
-                ),
+                Error::Unsupported if app => {
+                    tr!("Mirror", "Set up Wireless debugging in Syndic on the phone to open its apps here.")
+                }
                 Error::Unsupported => {
                     tr!(
                         "Mirror",

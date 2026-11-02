@@ -804,10 +804,7 @@ mod imp {
         let body = if no_all_files_access {
             tr!("Storage", "On the phone, allow All files access for Syndic.")
         } else {
-            tr!(
-                "Storage",
-                "On the phone, turn on Browse this phone's storage in File Explorer in Syndic."
-            )
+            tr!("Storage", "On the phone, turn on Browse this phone's storage in File Explorer in Syndic.")
         };
         crate::win::toast::show(crate::win::toast::Toast {
             device: crate::transfers::TOAST_GROUP.into(),
@@ -1480,10 +1477,7 @@ mod imp {
             let root = Path::new(r"C:\Users\alice\Syndic\Pixel 9");
             assert_eq!(relative_path_under_root(root, root), Some(String::new()));
             assert_eq!(
-                relative_path_under_root(
-                    root,
-                    Path::new(r"C:\Users\alice\Syndic\Pixel 9\DCIM\Camera\a.jpg")
-                ),
+                relative_path_under_root(root, Path::new(r"C:\Users\alice\Syndic\Pixel 9\DCIM\Camera\a.jpg")),
                 Some("DCIM/Camera/a.jpg".into())
             );
             assert_eq!(

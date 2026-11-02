@@ -358,8 +358,7 @@ mod release_download {
     #[test]
     #[ignore = "needs the internet"]
     fn downloads_a_release_installer() {
-        let url =
-            "https://github.com/thtbee/nectarlink/releases/download/v0.1.2/Syndic-0.1.2-x64-setup.exe";
+        let url = "https://github.com/thtbee/nectarlink/releases/download/v0.1.2/Syndic-0.1.2-x64-setup.exe";
         let dir = tempfile::tempdir().unwrap();
         let file = dir.path().join("setup.exe.part");
         let started = std::time::Instant::now();
