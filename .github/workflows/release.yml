@@ -236,12 +236,14 @@ jobs:
           cmdline-tools-version: "16111833"
           packages: "platforms;android-37.0 ndk;30.0.16248370 build-tools;37.0.0"
       - uses: gradle/actions/setup-gradle@v6
-      - name: The signing key
-        env:
-          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+      - name: Generate release keystore
+        working-directory: android
         run: |
-          if [ -z "$KEYSTORE" ]; then echo "Building unsigned release APK..."; ./gradlew assembleRelease || ./gradlew assembleDebug; exit 0; fi
-          echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
+          keytool -genkey -v -keystore release.jks -alias syndic -keyalg RSA -keysize 2048 -validity 10000 -storepass syndic123 -keypass syndic123 -dname "CN=Syndic, OU=Dev, O=Syndic, L=City, S=State, C=US"
+          echo "KEYSTORE_PATH=$PWD/release.jks" >> $GITHUB_ENV
+          echo "KEYSTORE_PASSWORD=syndic123" >> $GITHUB_ENV
+          echo "KEY_ALIAS=syndic" >> $GITHUB_ENV
+          echo "KEY_PASSWORD=syndic123" >> $GITHUB_ENV
       - name: Build
         working-directory: android
         env:
