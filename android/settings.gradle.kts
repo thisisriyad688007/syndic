@@ -26,5 +26,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Nectarlink"
+rootProject.name = "Syndic"
 include(":app")
