@@ -224,3 +224,13 @@ android {
         }
     }
 }
+
+android {
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = false
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+        }
+    }
+}
