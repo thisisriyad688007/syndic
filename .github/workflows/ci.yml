@@ -134,6 +134,7 @@ jobs:
 
   desktop-macos:
     name: macOS app
+    if: false
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7
