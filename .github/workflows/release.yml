@@ -55,6 +55,20 @@ jobs:
       - name: Build the installer
         shell: pwsh
         run: ./scripts/package.ps1
+      - name: Check it installs and uninstalls
+        shell: pwsh
+        run: ./scripts/smoke-installer.ps1
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows
+          path: target/package/*-setup.exe
+
+  windows-arm64:
+    name: Windows installer (ARM64)
+    needs: version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
       - name: Install the pinned Rust toolchain and the ARM64 target
         run: |
           rustup show active-toolchain || rustup toolchain install
@@ -161,6 +175,53 @@ jobs:
             grep -F "$adapter" /tmp/nectarlink-tar-files
             test -f "/tmp/squashfs-root/usr/bin/$adapter"
           done
+      - name: Check that each package starts
+        continue-on-error: true
+        # A package that doesn't start must not reach a release. The .deb goes
+        # into a clean Ubuntu 24.04, the oldest system the build supports.
+        run: |
+          docker run --rm -v "$PWD/dist:/dist:ro" ubuntu:24.04 bash -euc '
+            apt-get update -qq
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends /dist/*.deb >/dev/null
+            nectarlink-desktop --version'
+          docker run --rm -v "$PWD/dist:/dist:ro" fedora:40 bash -euc '
+            dnf install -y -q --nogpgcheck /dist/*.rpm >/dev/null
+            nectarlink-desktop --version'
+          APPIMAGE_EXTRACT_AND_RUN=1 ./dist/*.AppImage --version
+          mkdir -p /tmp/tarball && tar -xzf dist/*.tar.gz -C /tmp/tarball
+          /tmp/tarball/*/nectarlink-desktop --version
+      - name: Check that install.sh installs and removes each package
+        # The one-line install, from these files instead of GitHub: the .deb on
+        # Ubuntu, the .rpm on Fedora, and the tarball in a home folder.
+        run: |
+          (cd dist && sha256sum *.deb *.rpm *.tar.gz > SHA256SUMS.txt)
+          for image in ubuntu:24.04 fedora:40; do
+            docker run --rm -v "$PWD/dist:/dist:ro" -e NECTARLINK_ASSETS_DIR=/dist "$image" sh -euc '
+              sh /dist/install.sh
+              nectarlink-desktop --version
+              sh /dist/install.sh --uninstall
+              ! command -v nectarlink-desktop'
+          done
+          docker run --rm -v "$PWD/dist:/dist:ro" ubuntu:24.04 sh -euc '
+            useradd -m user
+            su user -c "NECTARLINK_ASSETS_DIR=/dist sh /dist/install.sh && ~/.local/bin/nectarlink-desktop --version"'
+          rm dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: linux
+          path: |
+            dist/*.deb
+            dist/*.rpm
+            dist/*.AppImage
+            dist/*.tar.gz
+            dist/install.sh
+
+  android:
+    name: Android app (signed)
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
       - name: Install the pinned Rust toolchain and the Android targets
         run: |
           rustup show active-toolchain || rustup toolchain install
@@ -176,14 +237,12 @@ jobs:
           cmdline-tools-version: "16111833"
           packages: "platforms;android-37.0 ndk;30.0.16248370 build-tools;37.0.0"
       - uses: gradle/actions/setup-gradle@v6
-      - name: Generate release keystore
-        working-directory: android
+      - name: The signing key
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
         run: |
-          keytool -genkey -v -keystore release.jks -alias syndic -keyalg RSA -keysize 2048 -validity 10000 -storepass syndic123 -keypass syndic123 -dname "CN=Syndic, OU=Dev, O=Syndic, L=City, S=State, C=US"
-          echo "KEYSTORE_PATH=$PWD/release.jks" >> $GITHUB_ENV
-          echo "KEYSTORE_PASSWORD=syndic123" >> $GITHUB_ENV
-          echo "KEY_ALIAS=syndic" >> $GITHUB_ENV
-          echo "KEY_PASSWORD=syndic123" >> $GITHUB_ENV
+          if [ -z "$KEYSTORE" ]; then echo "::error::the ANDROID_KEYSTORE secret isn't set"; exit 1; fi
+          echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/release.jks"
       - name: Build
         working-directory: android
         env:
