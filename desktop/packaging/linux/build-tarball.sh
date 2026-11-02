@@ -200,7 +200,7 @@ install -m 0644 "${SELF_DIR}/share/metainfo/org.nectarlink.desktop.metainfo.xml"
 if command -v update-desktop-database >/dev/null 2>&1; then
     update-desktop-database -q "${APPS_DIR}" || true
 fi
-echo "Installed NectarLink to ${PREFIX} (${BIN_LINK})"
+echo "Installed Syndic to ${PREFIX} (${BIN_LINK})"
 EOF
 chmod 0755 "${BUNDLE_DIR}/install.sh"
 
@@ -224,7 +224,7 @@ else
     rm -f "${XDG_DATA_HOME:-$HOME/.local/share}/icons/hicolor/scalable/apps/nectarlink.svg"
     rm -f "${XDG_DATA_HOME:-$HOME/.local/share}/icons/hicolor/512x512/apps/nectarlink.png"
 fi
-echo "Uninstalled NectarLink."
+echo "Uninstalled Syndic."
 EOF
 chmod 0755 "${BUNDLE_DIR}/uninstall.sh"
 

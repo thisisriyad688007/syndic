@@ -24,12 +24,12 @@ BEGIN
     BLOCK "040904B0"
     BEGIN
       VALUE "CompanyName", "The NectarLink contributors"
-      VALUE "FileDescription", "NectarLink virtual camera"
+      VALUE "FileDescription", "Syndic virtual camera"
       VALUE "FileVersion", "{version}"
       VALUE "InternalName", "nectarlink_vcam"
       VALUE "LegalCopyright", "GPL-3.0-or-later"
       VALUE "OriginalFilename", "nectarlink_vcam.dll"
-      VALUE "ProductName", "NectarLink"
+      VALUE "ProductName", "Syndic"
       VALUE "ProductVersion", "{version}"
     END
   END

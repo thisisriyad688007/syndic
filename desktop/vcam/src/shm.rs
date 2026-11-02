@@ -837,7 +837,7 @@ fn build_placeholder_card(width: u32, height: u32, phone_name: &str) -> CachedPl
     } else {
         format!("Start the webcam on {phone_name}")
     };
-    let caption = "NectarLink Camera";
+    let caption = "Syndic Camera";
 
     let font = TrueTypeFont::parse(FIGTREE_TTF);
     let head_px = (22.0 * scale).clamp(12.0, 38.0);

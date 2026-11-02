@@ -44,7 +44,7 @@ SetCompressor /SOLID zlib
 ; APP names the install folder, registry keys and the firewall rule; DISPLAY is
 ; the name people see.
 !define APP "Nectarlink"
-!define DISPLAY "NectarLink"
+!define DISPLAY "Syndic"
 !define EXE "nectarlink-desktop.exe"
 !define SETUP_EXE "Nectarlink Setup.exe"
 !define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP}"
@@ -65,7 +65,7 @@ ShowUninstDetails nevershow
 VIProductVersion "${VERSION}.0"
 VIAddVersionKey "ProductName" "${DISPLAY}"
 VIAddVersionKey "FileDescription" "${DISPLAY} Setup"
-VIAddVersionKey "CompanyName" "The NectarLink contributors"
+VIAddVersionKey "CompanyName" "Syndic"
 VIAddVersionKey "LegalCopyright" "GPL-3.0-or-later"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "ProductVersion" "${DISPLAY_VERSION}"
@@ -329,7 +329,7 @@ Section "Install"
   ; Phones reach this PC over UDP (QUIC) and find it with mDNS.
   !insertmacro Progress "step firewall"
   nsExec::Exec 'netsh advfirewall firewall delete rule name="${FIREWALL_RULE}"'
-  nsExec::Exec 'netsh advfirewall firewall add rule name="${FIREWALL_RULE}" dir=in action=allow program="$INSTDIR\${EXE}" enable=yes profile=private,domain description="Lets paired phones connect to NectarLink."'
+  nsExec::Exec 'netsh advfirewall firewall add rule name="${FIREWALL_RULE}" dir=in action=allow program="$INSTDIR\${EXE}" enable=yes profile=private,domain description="Lets paired phones connect to Syndic."'
 
   ; Updates without an administrator prompt: a task that runs this app as
   ; SYSTEM to install a newer release (desktop/app/src/updater.rs). Only
@@ -348,7 +348,7 @@ Section "Install"
   FileWriteUTF16LE /BOM $0 '<?xml version="1.0" encoding="UTF-16"?>$\r$\n'
   FileWriteUTF16LE $0 '<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">$\r$\n'
   FileWriteUTF16LE $0 '  <RegistrationInfo>$\r$\n'
-  FileWriteUTF16LE $0 '    <Description>Installs new versions of NectarLink from its GitHub releases.</Description>$\r$\n'
+  FileWriteUTF16LE $0 '    <Description>Installs new versions of Syndic from its GitHub releases.</Description>$\r$\n'
   FileWriteUTF16LE $0 '    <SecurityDescriptor>D:(A;;FA;;;SY)(A;;FA;;;BA)(A;;GRGX;;;AU)</SecurityDescriptor>$\r$\n'
   FileWriteUTF16LE $0 '  </RegistrationInfo>$\r$\n'
   FileWriteUTF16LE $0 '  <Principals>$\r$\n'
@@ -401,7 +401,7 @@ Section "Install"
   WriteRegDWORD HKLM "Software\${APP}" "AdminOnlyFolder" $AdminOnly
   WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayName" "${DISPLAY}"
   WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayVersion" "${DISPLAY_VERSION}"
-  WriteRegStr HKLM "${UNINSTALL_KEY}" "Publisher" "The NectarLink contributors"
+  WriteRegStr HKLM "${UNINSTALL_KEY}" "Publisher" "Syndic"
   WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayIcon" "$INSTDIR\${EXE}"
   WriteRegStr HKLM "${UNINSTALL_KEY}" "InstallLocation" "$INSTDIR"
   WriteRegStr HKLM "${UNINSTALL_KEY}" "URLInfoAbout" "https://github.com/thtbee/nectarlink"
