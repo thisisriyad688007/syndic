@@ -93,7 +93,7 @@ jobs:
         run: echo "Bypassing smoke tests"
       - uses: actions/upload-artifact@v7
         with:
-          name: nectarlink-windows-x64
+          name: syndic-windows-x64
           path: target/package/*-setup.exe
           retention-days: 14
 
@@ -128,7 +128,7 @@ jobs:
         run: ./scripts/package.ps1 -Arch arm64
       - uses: actions/upload-artifact@v7
         with:
-          name: nectarlink-windows-arm64
+          name: syndic-windows-arm64
           path: target/package/*-setup.exe
           retention-days: 14
 
@@ -240,7 +240,7 @@ jobs:
         run: ./gradlew --no-daemon assembleDebug
       - uses: actions/upload-artifact@v7
         with:
-          name: nectarlink-android-debug
+          name: syndic-android-debug
           path: android/app/build/outputs/apk/debug/*.apk
           retention-days: 14
 
