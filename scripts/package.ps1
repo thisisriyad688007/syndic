@@ -98,10 +98,10 @@ if (-not $SkipBuild) {
     if ($isArm64) {
         $env:QMAKE = Join-Path $arm64ToolDir "qmake6.exe"
         if (-not (Test-Path $env:QMAKE)) { $env:QMAKE = Join-Path $arm64ToolDir "qmake.exe" }
-        Invoke-Native "the build" { cargo build --locked --release --target aarch64-pc-windows-msvc -p syndic-desktop -p syndic-vcam }
+        Invoke-Native "the build" { cargo build --locked --release --target aarch64-pc-windows-msvc -p nectarlink-desktop -p syndic-vcam }
     } else {
         $env:PATH = "$(Join-Path $targetKit 'bin');$env:PATH"
-        Invoke-Native "the build" { cargo build --locked --release -p syndic-desktop -p syndic-vcam }
+        Invoke-Native "the build" { cargo build --locked --release -p nectarlink-desktop -p syndic-vcam }
     }
 }
 $exe = Join-Path $targetDir 'syndic-desktop.exe'
