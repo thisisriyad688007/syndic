@@ -295,7 +295,27 @@ object Elevated {
      * Pairs with the code wireless debugging shows ("Pair device with
      * pairing code"; the dialog must still be open), then starts.
      */
-    suspend fun pair(code: String): Boolean = withContext(Dispatchers.IO) {
+    
+    suspend fun pair(rawInput: String): Boolean = withContext(Dispatchers.IO) {
+        val trimmed = rawInput.trim()
+        val parts = trimmed.split(Regex("[\s:]+")).filter { it.isNotBlank() }
+        val (explicitPort, actualCode) = if (parts.size >= 2 && parts[0].toIntOrNull() != null) {
+            parts[0].toInt() to parts[1]
+        } else {
+            null to trimmed.filter(Char::isDigit)
+        }
+
+        if (explicitPort != null) {
+            try {
+                connection().pair("127.0.0.1", explicitPort, actualCode)
+                setPaired(true)
+                start()
+                return@withContext true
+            } catch (e: Exception) {
+                Log.w(TAG, "Direct pairing on explicit port $explicitPort failed", e)
+            }
+        }
+
         lock.withLock {
             _state.value = State.Starting
             val paired = if (LoopbackAdb.preferred()) {

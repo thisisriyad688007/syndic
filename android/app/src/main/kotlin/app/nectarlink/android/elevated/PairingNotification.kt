@@ -67,7 +67,7 @@ object PairingNotification {
     /** The code the user typed. */
     class Receiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val code = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(KEY_CODE)?.toString()?.filter(Char::isDigit)
+            val code = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(KEY_CODE)?.toString()?.trim()
             val app = context.applicationContext
             if (code.isNullOrEmpty()) {
                 show(app)
