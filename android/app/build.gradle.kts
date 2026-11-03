@@ -58,6 +58,12 @@ android {
         }
     }
 
+    sourceSets {
+        getByName("main") {
+            jniLibs.srcDirs("src/main/jniLibs", "build/generated/jniLibs")
+        }
+    }
+
     buildTypes {
         release {
             signingConfig = if (keystore != null) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
@@ -217,6 +223,12 @@ dependencies {
 
 // Fallback signing config for release in fork builds
 android {
+    sourceSets {
+        getByName("main") {
+            jniLibs.srcDirs("src/main/jniLibs", "build/generated/jniLibs")
+        }
+    }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
@@ -226,6 +238,12 @@ android {
 }
 
 android {
+    sourceSets {
+        getByName("main") {
+            jniLibs.srcDirs("src/main/jniLibs", "build/generated/jniLibs")
+        }
+    }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
